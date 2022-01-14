@@ -1370,7 +1370,7 @@ If you offer a hardware kit using this software, show your appreciation by sendi
 
 */
 
-#define CODE_VERSION "2022.01.12"
+#define CODE_VERSION "2022.01.14"
 #define eeprom_magic_number 48              // you can change this number to have the unit re-initialize EEPROM
 #include <arduino.h>
 #include <stdio.h>
@@ -2313,6 +2313,8 @@ int memory_start(byte memory_number);
 int memory_end(byte memory_number);
 void boop();
 void beep();
+void boop_beep();
+void beep_boop();
 byte play_memory(byte memory_number);
 void serial_set_memory_repeat(PRIMARY_SERIAL_CLS * port_to_use);
 void serial_play_memory(byte memory_number);
@@ -2320,6 +2322,38 @@ void serial_set_memory_repeat(PRIMARY_SERIAL_CLS * port_to_use);
 void serial_program_memory(PRIMARY_SERIAL_CLS * port_to_use);
 void serial_status_memories(PRIMARY_SERIAL_CLS * port_to_use);
 void repeat_play_memory(PRIMARY_SERIAL_CLS * port_to_use);
+byte analogbuttonread(byte button_number);
+void command_sidetone_freq_adj();
+void command_dah_to_dit_ratio_adjust();
+void command_weighting_adjust();
+void command_speed_mode(byte mode);
+void command_keying_compensation_adjust();
+void command_set_serial_number();
+void command_tuning_mode();
+void check_the_memory_buttons();
+void command_program_memory();
+void command_set_mem_repeat_delay();
+void program_memory(int memory_number);
+void cli_autospace_timing_factor(PRIMARY_SERIAL_CLS * port_to_use,String command_arguments);
+void serial_set_farnsworth(PRIMARY_SERIAL_CLS * port_to_use);
+void winkey_port_write(byte byte_to_send,byte override_filter);
+void serial_cw_practice(PRIMARY_SERIAL_CLS * port_to_use);
+void serial_receive_practice_menu(PRIMARY_SERIAL_CLS * port_to_use,byte practice_mode);
+void serial_random_menu(PRIMARY_SERIAL_CLS * port_to_use);
+void serial_wordsworth_menu(PRIMARY_SERIAL_CLS * port_to_use);
+void serial_receive_practice_menu(PRIMARY_SERIAL_CLS * port_to_use,byte practice_mode);
+void receive_transmit_echo_practice(PRIMARY_SERIAL_CLS * port_to_use, byte practice_mode_called);
+void serial_practice_interactive(PRIMARY_SERIAL_CLS * port_to_use,byte practice_type_called);
+void serial_practice_non_interactive(PRIMARY_SERIAL_CLS * port_to_use,byte practice_type_called);
+void random_practice(PRIMARY_SERIAL_CLS * port_to_use,byte random_mode,byte group_size);
+void wordsworth_practice(PRIMARY_SERIAL_CLS * port_to_use,byte practice_type);
+void serial_receive_transmit_echo_menu(PRIMARY_SERIAL_CLS * port_to_use);
+void transmit_hell_char (byte hellchar);
+void transmit_hell_pixel (byte hellbit);
+void transmit_hell_pixels (const char* hell_pixels, byte hellchar);
+void speed_change_command_mode(int change);
+void speed_change(int change);
+
 // Subroutines --------------------------------------------------------------------------------------------
 
 
@@ -6663,7 +6697,7 @@ void tx_and_sidetone_key (int state)
         }
         if ((configuration.sidetone_mode == SIDETONE_ON) || (keyer_machine_mode == KEYER_COMMAND_MODE) || ((configuration.sidetone_mode == SIDETONE_PADDLE_ONLY) && (sending_mode == MANUAL_SENDING))) {
           #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
-            noTone(sidetone_line,0); //SP5IOU 20220111
+            noTone(sidetone_line); //SP5IOU 20220111
           #else
             if (sidetone_line) {
               digitalWrite(sidetone_line, sidetone_line_inactive_state);
@@ -9121,7 +9155,7 @@ void boop()
   #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
     tone(sidetone_line, hz_low_beep);
     delay(100);
-    noTone(sidetone_line,0); //SP5IOU 20220111
+    noTone(sidetone_line); //SP5IOU 20220111
   #else
     if (sidetone_line) {
       digitalWrite(sidetone_line, sidetone_line_active_state);
@@ -9140,7 +9174,7 @@ void beep_boop()
     delay(100);
     tone(sidetone_line, hz_low_beep);
     delay(100);
-    noTone(sidetone_line,0);
+    noTone(sidetone_line);
   #else
     if (sidetone_line) {
       digitalWrite(sidetone_line, sidetone_line_active_state);
@@ -9159,7 +9193,7 @@ void boop_beep()
     delay(100);
     tone(sidetone_line, hz_high_beep);
     delay(100);
-    noTone(sidetone_line,0);
+    noTone(sidetone_line);
   #else
     if (sidetone_line) {
       digitalWrite(sidetone_line, sidetone_line_active_state);
@@ -17852,7 +17886,7 @@ void initialize_rotary_encoder(){
   
   #ifdef FEATURE_ROTARY_ENCODER
     #ifdef OPTION_ENCODER_ENABLE_PULLUPS
-      #if defined (ARDUINO_MAPLE_MINI)||defined(ARDUINO_GENERIC_STM32F103C) //sp5iou 20180329
+      #if defined (ARDUINO_MAPLE_MINI)||defined(ARDUINO_GENERIC_STM32F103C) ||defined(HARDWARE_ESP32_DEV)//sp5iou 20180329 //SP5IOU 20220114
         pinMode(rotary_pin1, INPUT_PULLUP);//sp5iou 20180329
         pinMode(rotary_pin2, INPUT_PULLUP);//sp5iou 20180329
       #else // (ARDUINO_MAPLE_MINI)||defined(ARDUINO_GENERIC_STM32F103C) //sp5iou 20180329

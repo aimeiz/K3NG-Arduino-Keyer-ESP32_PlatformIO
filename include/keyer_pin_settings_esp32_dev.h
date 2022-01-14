@@ -18,7 +18,7 @@ ESP32 dev board
 #define tx_key_line_6 0
 #define sidetone_line 5         // connect a speaker for sidetone
 #define potentiometer 0        // Speed potentiometer (0 to 5 V) Use pot from 1k to 10k
-#define ptt_tx_1 3              // PTT ("push to talk") lines
+#define ptt_tx_1 0              // PTT ("push to talk") lines
 #define ptt_tx_2 0              //   Can be used for keying fox transmitter, T/R switch, or keying slow boatanchors
 #define ptt_tx_3 0              //   These are optional - set to 0 if unused
 #define ptt_tx_4 0
@@ -82,8 +82,8 @@ FEATURE_SIDETONE_SWITCH
 // rotary encoder pins and options - rotary encoder code from Jim Balls M0CKE
 #ifdef FEATURE_ROTARY_ENCODER
   #define OPTION_ENCODER_HALF_STEP_MODE     // Half-step mode?
-  #define rotary_pin1 34                      // CW Encoder Pin
-  #define rotary_pin2 35                   // CCW Encoder Pin
+  #define rotary_pin1 19 //34                      // CW Encoder Pin Not all ESP32 pins supports PULLUP SP5IOU
+  #define rotary_pin2 21 //35                   // CCW Encoder Pin  Not all ESP32 pins supports PULLUP SP5IOU
   #define OPTION_ENCODER_ENABLE_PULLUPS     // define to enable weak pullups.
 #endif //FEATURE_ROTARY_ENCODER
 
