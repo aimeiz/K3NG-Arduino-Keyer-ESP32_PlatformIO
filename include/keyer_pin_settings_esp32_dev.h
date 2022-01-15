@@ -10,15 +10,15 @@ ESP32 dev board
 
 #define paddle_left 22 //36
 #define paddle_right 23 //39
-#define tx_key_line_1 2 //18       // (high = key down/tx on)
-#define tx_key_line_2 4 //0
+#define tx_key_line_1 16 //RX2 //2 //18       // (high = key down/tx on)
+#define tx_key_line_2 17 //TX2 //0
 #define tx_key_line_3 0
 #define tx_key_line_4 0
 #define tx_key_line_5 0
 #define tx_key_line_6 0
 #define sidetone_line 5         // connect a speaker for sidetone
 #define potentiometer 0        // Speed potentiometer (0 to 5 V) Use pot from 1k to 10k
-#define ptt_tx_1 0              // PTT ("push to talk") lines
+#define ptt_tx_1 4              // PTT ("push to talk") lines
 #define ptt_tx_2 0              //   Can be used for keying fox transmitter, T/R switch, or keying slow boatanchors
 #define ptt_tx_3 0              //   These are optional - set to 0 if unused
 #define ptt_tx_4 0
