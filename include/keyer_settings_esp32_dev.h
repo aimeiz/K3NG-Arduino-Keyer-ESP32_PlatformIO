@@ -80,7 +80,7 @@ GENERIC STM32F103C
 #define eeprom_write_time_ms 30000
 
 #ifdef FEATURE_BUTTONS
-  #define analog_buttons_number_of_buttons 5 // For Keypad only command butrton is neaded 6 //4  // includes the command button (command button + 3 memory buttons = 4) //sp5iou 20180319
+  #define analog_buttons_number_of_buttons 6 // For Keypad only command butrton is neaded 6 //4  // includes the command button (command button + 3 memory buttons = 4) //sp5iou 20180319
   #define analog_buttons_r1 10
   #define analog_buttons_r2 1
 #endif

@@ -10,8 +10,8 @@ ESP32 dev board
 
 #define paddle_left 22 //36
 #define paddle_right 23 //39
-#define tx_key_line_1 18       // (high = key down/tx on)
-#define tx_key_line_2 0
+#define tx_key_line_1 2 //18       // (high = key down/tx on)
+#define tx_key_line_2 4 //0
 #define tx_key_line_3 0
 #define tx_key_line_4 0
 #define tx_key_line_5 0
@@ -30,7 +30,7 @@ ESP32 dev board
 #define potentiometer_enable_pin 0  // if defined, the potentiometer will be enabled only when this pin is held low; set to 0 to ignore this pin
 
 #ifdef FEATURE_BUTTONS
-  #define analog_buttons_pin 4
+  #define analog_buttons_pin A0 //VP on the board 34 //Not all pins are available for ADC. GPIO34 is ADC1 CH6
   #define command_mode_active_led 2 //for ESP32 On Board LED
 #endif //FEATURE_BUTTONS
 
