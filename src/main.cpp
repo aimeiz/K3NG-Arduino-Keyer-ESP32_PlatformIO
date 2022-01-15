@@ -3336,103 +3336,6 @@ void TC3_Handler ( void ) {
   
 }
 #endif
-/*
-//sp5iou 2018/0329 This is already in stm32 SDK standard library
-#elif defined(ARDUINO_MAPLE_MINI) || defined(ARDUINO_GENERIC_STM32F103C) //HARDWARE_ARDUINO_DUE
-//This code from http://www.stm32duino.com/viewtopic.php?t=496
-     
-///////////////////////////////////////////////////////////////////////
-//
-// tone(pin,frequency[,duration]) generate a tone on a given pin
-//
-// noTone(pin)                    switch of the tone on the pin
-//
-///////////////////////////////////////////////////////////////////////
-
-//#include "Arduino.h"
-//#include <HardwareTimer.h>
-
-#ifndef TONE_TIMER
-  #define TONE_TIMER 2
-#endif
-
-HardwareTimer tone_timer(TONE_TIMER);
-
-bool tone_state = true;             // last pin state for toggling
-short tone_pin = -1;                // pin for outputting sound
-short tone_freq = 444;              // tone frequency (0=pause)
-unsigned tone_micros = 500000/444;  // tone have wave time in usec
-int tone_counts = 0;                // tone duration in units of half waves
-
-// timer hander for tone with no duration specified, 
-// will keep going until noTone() is called
-void tone_handler_1(void) {
-  tone_state = !tone_state;
-  digitalWrite(tone_pin,tone_state);
-}
-
-// timer hander for tone with a specified duration,
-// will stop automatically when duration time is up.
-void tone_handler_2(void) {   // check duration
-  if(tone_freq>0){
-   tone_state = !tone_state;
-   digitalWrite(tone_pin,tone_state);
-  }
-  if(!--tone_counts){
-   tone_timer.pause();
-   pinMode(tone_pin, INPUT);
-  }
-}
-
-//  play a tone on given pin with given frequency and optional duration in msec
-void tone(uint8_t pin, unsigned short freq, unsigned duration = 0) {
-  tone_pin = pin;
-  tone_freq = freq;
-  tone_micros = 500000/(freq>0?freq:1000);
-  tone_counts = 0;
-
-  tone_timer.pause();
-
-  if(freq >= 0){
-    if(duration > 0)tone_counts = ((long)duration)*1000/tone_micros;
-    pinMode(tone_pin, OUTPUT);
-
-    // set timer to half period in microseconds
-    tone_timer.setPeriod(tone_micros);
-
-    // Set up an interrupt on channel 1
-    tone_timer.setChannel1Mode(TIMER_OUTPUT_COMPARE);
-    tone_timer.setCompare(TIMER_CH1, 1);  // Interrupt 1 count after each update
-    tone_timer.attachCompare1Interrupt(tone_counts?tone_handler_2:tone_handler_1);
-
-    // Refresh the tone timer
-    tone_timer.refresh();
-
-    // Start the timer counting
-    tone_timer.resume();
-  } else {
-    pinMode(tone_pin, INPUT);
-  }
-}
-
-// disable tone on specified pin, if any
-void noTone(uint8_t pin){
-  tone(pin,-1);
-}
-
-
-#endif //ARDUINO_MAPLE_MINI / ARDUINO_SAM_DUE
-*/
-
-//-------------------------------------------------------------------------------------------------------
-
-/*   Sleep code prior to 2016-01-18
-#ifdef FEATURE_SLEEP
-void wakeup() {
-  detachInterrupt(0);
-}
-#endif //FEATURE_SLEEP
-*/
 
 #ifdef FEATURE_SLEEP     // Code contributed by Graeme, ZL2APV 2016-01-18
 void wakeup() {
@@ -6890,7 +6793,11 @@ void tx_and_sidetone_key (int state)
       }
       if ((configuration.sidetone_mode == SIDETONE_ON) || (keyer_machine_mode == KEYER_COMMAND_MODE) || ((configuration.sidetone_mode == SIDETONE_PADDLE_ONLY) && (sending_mode == MANUAL_SENDING))) {
         #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
-          tone(sidetone_line, configuration.hz_sidetone);
+         #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+              tone(sidetone_line,configuration.hz_sidetone,0,0);                                              // generate a tone on the speaker pin
+         #else  
+        tone(sidetone_line, configuration.hz_sidetone);
+        #endif
         #else
           if (sidetone_line) {
             digitalWrite(sidetone_line, sidetone_line_active_state);
@@ -6911,8 +6818,11 @@ void tx_and_sidetone_key (int state)
         }
         if ((configuration.sidetone_mode == SIDETONE_ON) || (keyer_machine_mode == KEYER_COMMAND_MODE) || ((configuration.sidetone_mode == SIDETONE_PADDLE_ONLY) && (sending_mode == MANUAL_SENDING))) {
           #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
-            noTone(sidetone_line,0); //SP5IOU 20220111
+          #if defined HARDWARE_ESP32_DEV //SP5IOU 20220115
+            noTone(sidetone_line,0);
           #else
+            noTone(sidetone_line);
+          #endif
             if (sidetone_line) {
               digitalWrite(sidetone_line, sidetone_line_inactive_state);
             }
@@ -6963,7 +6873,11 @@ void tx_and_sidetone_key (int state)
         }
         if ((configuration.sidetone_mode == SIDETONE_ON) || (keyer_machine_mode == KEYER_COMMAND_MODE) || ((configuration.sidetone_mode == SIDETONE_PADDLE_ONLY) && (sending_mode == MANUAL_SENDING))) {
           #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
+          #if defined HARDWARE_ESP32_DEV //SP5IOU 20220115
+            noTone(sidetone_line,0);
+          #else
             noTone(sidetone_line);
+          #endif
           #else
             if (sidetone_line) {
               digitalWrite(sidetone_line, sidetone_line_inactive_state);
@@ -8419,11 +8333,16 @@ void command_progressive_5_char_echo_practice() {
               #endif                                                                      // FEATURE_DISPLAY
               unsigned int NEWtone               =  400;                                  // the initial tone freuency for the tone sequence
               unsigned int TONEduration          =   50;                                  // define the duration of each tone element in the tone sequence to drive a speaker
-              for (int k=0; k<6; k++) {                                                   // a loop to generate some increasing tones
+              for (int k=0; k<6; k++) {
+#if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+ tone(sidetone_line,NEWtone,TONEduration,0);                                              // generate a tone on the speaker pin
+#else  
+                                                                // a loop to generate some increasing tones
                 tone(sidetone_line,NEWtone);                                              // generate a tone on the speaker pin
                 delay(TONEduration);                                                      // hold the tone for the specified delay period
-                noTone(sidetone_line,0);                                                    // turn off the tone
-                NEWtone = NEWtone*1.25;                                                   // calculate a new value for the tone frequency
+                noTone(sidetone_line); 
+#endif                                                                   // turn off the tone
+                NEWtone = NEWtone*1.25;                                                                  // calculate a new value for the tone frequency
               }                                                                           // end for
               send_char(' ',0);
               send_char(' ',0);
@@ -8783,7 +8702,11 @@ void command_sidetone_freq_adj() {
   #endif
 
   while (looping) {
-    tone(sidetone_line, configuration.hz_sidetone);
+    #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+              tone(sidetone_line,configuration.hz_sidetone,100,0);                                              // generate a tone on the speaker pin
+         #else  
+          tone(sidetone_line, configuration.hz_sidetone);
+        #endif
     if (paddle_pin_read(paddle_left) == LOW) {
       #ifdef FEATURE_DISPLAY
 	#ifdef OPTION_SWAP_PADDLE_PARAMETER_CHANGE_DIRECTION
@@ -8836,7 +8759,11 @@ void command_sidetone_freq_adj() {
 
   }
   while (paddle_pin_read(paddle_left) == LOW || paddle_pin_read(paddle_right) == LOW || analogbuttonread(0) ) {}  // wait for all lines to go high
-  noTone(sidetone_line,0);
+          #if defined HARDWARE_ESP32_DEV //SP5IOU 20220115
+            noTone(sidetone_line,0);
+          #else
+            noTone(sidetone_line);
+          #endif
 }
 #endif                                                        //FEATURE_COMMAND_MODE
 
@@ -9351,8 +9278,11 @@ void beep()
     //   delay(200);
     //   noTone(sidetone_line);
     // #else
+    #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+      tone(sidetone_line,hz_high_beep,200,0);                                              // generate a tone on the speaker pin
+    #else  
       tone(sidetone_line, hz_high_beep, 200);
-    // #endif
+    #endif
   #else
     if (sidetone_line) {
       digitalWrite(sidetone_line, sidetone_line_active_state);
@@ -9367,9 +9297,13 @@ void beep()
 void boop()
 {
   #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
-    tone(sidetone_line, hz_low_beep);
+   #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+      tone(sidetone_line,hz_low_beep,100,0);                                              // generate a tone on the speaker pin
+    #else  
+ tone(sidetone_line, hz_low_beep);
     delay(100);
-    noTone(sidetone_line,0); //SP5IOU 20220111
+    noTone(sidetone_line);
+    #endif
   #else
     if (sidetone_line) {
       digitalWrite(sidetone_line, sidetone_line_active_state);
@@ -9384,11 +9318,16 @@ void boop()
 void beep_boop()
 {
   #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
+#if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+ tone(sidetone_line,hz_high_beep,100,0);                                              // generate a tone on the speaker pin
+ tone(sidetone_line,hz_low_beep,100,0);                                              // generate a tone on the speaker pin
+#else  
     tone(sidetone_line, hz_high_beep);
     delay(100);
     tone(sidetone_line, hz_low_beep);
     delay(100);
-    noTone(sidetone_line,0);
+    noTone(sidetone_line);
+    #endif
   #else
     if (sidetone_line) {
       digitalWrite(sidetone_line, sidetone_line_active_state);
@@ -9403,11 +9342,16 @@ void beep_boop()
 void boop_beep()
 {
   #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
+    #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+ tone(sidetone_line,hz_low_beep,100,0);                                              // generate a tone on the speaker pin
+ tone(sidetone_line,hz_high_beep,100,0);                                              // generate a tone on the speaker pin
+  #else  
     tone(sidetone_line, hz_low_beep);
     delay(100);
     tone(sidetone_line, hz_high_beep);
     delay(100);
     noTone(sidetone_line);
+  #endif
   #else
     if (sidetone_line) {
       digitalWrite(sidetone_line, sidetone_line_active_state);
@@ -14819,9 +14763,13 @@ void receive_transmit_echo_practice(PRIMARY_SERIAL_CLS * port_to_use, byte pract
               unsigned int NEWtone               =  400;                                // the initial tone freuency for the tone sequence
               unsigned int TONEduration          =   50;                                // define the duration of each tone element in the tone sequence to drive a speaker
               for (int k=0; k<6; k++) {                                                 // a loop to generate some increasing tones
+                 #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+                    tone(sidetone_line,NEWtone,TONEduration,0);                                              // generate a tone on the speaker pin
+                #else  
                 tone(sidetone_line,NEWtone);                                            // generate a tone on the speaker pin
                 delay(TONEduration);                                                    // hold the tone for the specified delay period
-                noTone(sidetone_line,0);                                                  // turn off the tone
+                noTone(sidetone_line);
+                #endif                                                  // turn off the tone
                 NEWtone = NEWtone*1.25;                                                 // calculate a new value for the tone frequency
               }                                                                         // end for
               send_char(' ', 0);
