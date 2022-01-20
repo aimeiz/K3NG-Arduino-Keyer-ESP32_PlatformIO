@@ -80,7 +80,7 @@ GENERIC STM32F103C
 #define eeprom_write_time_ms 30000
 
 #ifdef FEATURE_BUTTONS
-  #define analog_buttons_number_of_buttons 6 // For Keypad only command butrton is neaded 6 //4  // includes the command button (command button + 3 memory buttons = 4) //sp5iou 20180319
+  #define analog_buttons_number_of_buttons 9 // For Keypad only command butrton is neaded 6 //4  // includes the command button (command button + 3 memory buttons = 4) //sp5iou 20180319
   #define analog_buttons_r1 10
   #define analog_buttons_r2 1
 #endif
@@ -90,7 +90,7 @@ GENERIC STM32F103C
   #define number_of_memories byte(analog_buttons_number_of_buttons-1)
 #else
 //  #define number_of_memories byte(12)
-  #define number_of_memories byte(5) //sp5iou 20180329 With many memories, be carefull to not put to much content. It caould disable memory programming and eeprom formatting is then necessary
+  #define number_of_memories byte(8) //sp5iou 20180329 With many memories, be carefull to not put to much content. It caould disable memory programming and eeprom formatting is then necessary
 #endif
 
 #ifdef FEATURE_CAPACITIVE_PADDLE_PINS

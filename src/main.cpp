@@ -1370,8 +1370,8 @@ If you offer a hardware kit using this software, show your appreciation by sendi
 
 */
 
-#define CODE_VERSION "2022.01.15"
-#define eeprom_magic_number 41              // you can change this number to have the unit re-initialize EEPROM
+#define CODE_VERSION "2022.01.19"
+#define eeprom_magic_number 42              // you can change this number to have the unit re-initialize EEPROM
 #include <arduino.h>
 #include <stdio.h>
 #include "keyer_hardware.h"
@@ -6186,10 +6186,13 @@ void write_settings_to_eeprom(int initialize_eeprom) {
       int ee = 1;  // starting point of configuration struct
       for (i = 0; i < sizeof(configuration); i++){
         EEPROM.write(ee++, *p++);  
-      }        
+      }
+      #if defined(HARDWARE_ESP32_DEV)
+        if(EEPROM.commit()) Serial.print("EEPROM write success!!!");
+      #endif       
     } else {
 
-      async_eeprom_write = 1;  // initiate an asyncrhonous eeprom write
+    //  async_eeprom_write = 1;  // initiate an asyncrhonous eeprom write
 
     }
   
@@ -18015,16 +18018,16 @@ void initialize_keyer_state(){
     switch_to_tx_silent(1);
   #endif
 
-  #if (!defined(ARDUINO_SAM_DUE) || (defined(ARDUINO_SAM_DUE) && defined(FEATURE_EEPROM_E24C1024))) && !defined(HARDWARE_GENERIC_STM32F103C)
+  #if (!defined(ARDUINO_SAM_DUE) || (defined(ARDUINO_SAM_DUE) && defined(FEATURE_EEPROM_E24C1024))) && !defined(HARDWARE_GENERIC_STM32F103C) && !defined (HARDWARE_ESP32_DEV)
     memory_area_end = EEPROM.length() - 1;
   #else
     #if defined(HARDWARE_GENERIC_STM32F103C)
       memory_area_end = 253;
   #else
     #if (defined HARDWARE_ESP32_DEV)
-      memory_area_end = 511;/ /SP5IOU 20210901 - needs modified eeprom.h library
+      memory_area_end = 1023;//SP5IOU 20220119
   #else
-      memory_area_end = 1024; // not sure if this is a valid assumption
+      memory_area_end = 1023; // not sure if this is a valid assumption
   #endif
   #endif  
   #endif
@@ -18113,7 +18116,12 @@ void check_eeprom_for_initialization(){
 //      EEPROM.PageSize  = 0x800;     //SP5IOU 20210802 Increasinng size of eeprom emulation x2
 //      EEPROM.init(); //sp5iou 20180328 to reinitialize / initialize EEPROM
     #endif
-
+   #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220119
+   if(!EEPROM.begin(1024))
+    Serial.println("EEPROM initialzation fail!!!");
+   else
+     Serial.println("EEPROM initialzation complete"); 
+   #endif
   // do an eeprom reset to defaults if paddles are squeezed
   if (paddle_pin_read(paddle_left) == LOW && paddle_pin_read(paddle_right) == LOW) {
     while (paddle_pin_read(paddle_left) == LOW && paddle_pin_read(paddle_right) == LOW) {}
@@ -18136,7 +18144,6 @@ void initialize_eeprom(){
       EEPROM.init(); //sp5iou 20180328 to reinitialize / initialize EEPROM
       EEPROM.format();//sp5iou 20180328 to reinitialize / format EEPROM
    #endif
- 
    write_settings_to_eeprom(1);
   // #if defined(FEATURE_SINEWAVE_SIDETONE)
   //   initialize_tonsin();
@@ -22804,7 +22811,7 @@ void setup()
   #if defined(DEBUG_EEPROM_READ_SETTINGS)
     initialize_serial_ports();
   #endif
-//  check_eeprom_for_initialization();
+  check_eeprom_for_initialization();
 #if defined DEBUG_SETUP //SP5IOU 20210825
   Serial.println("Went setup up to here 6");
 #endif
