@@ -1334,9 +1334,9 @@ Recent Update History
       Updated version number for merging of Pull Request 110 https://github.com/k3ng/k3ng_cw_keyer/pull/110 from FrugalGuy (Ron, KO4RON)
         Adds FEATURE_LCD_BACKLIGHT_AUTO_DIM
 
-    2021.07.17.01
+    2021.03.23
       Added pins pin_sending_mode_automatic and pin_sending_mode_manual which go HIGH for automatica and manual sending modes    
-    2021.08.02
+    2022.01.23
     Added support for ESP32_DEV board (Beta) //SP5IOU
     Need to update arduino with library Tone32 available at https://github.com/lbernstone/Tone32 
     Files modified - k3ng_keyer.ino, keyer_hardware.h, added: keyer_features_and_options_ESP32_dev.h, keyer_settings_esp32_dev.h,
@@ -1370,7 +1370,7 @@ If you offer a hardware kit using this software, show your appreciation by sendi
 
 */
 
-#define CODE_VERSION "2022.01.19"
+#define CODE_VERSION "2022.01.23"
 #define eeprom_magic_number 42              // you can change this number to have the unit re-initialize EEPROM
 #include <arduino.h>
 #include <stdio.h>
@@ -1438,7 +1438,7 @@ If you offer a hardware kit using this software, show your appreciation by sendi
   #include "keyer_features_and_options_test_everything.h"
 #elif defined(HARDWARE_YAACWK)
   #include "keyer_features_and_options_yaacwk.h"
-#elif defined(HARDWARE_ESP32_DEV)//sp5iou 20210802
+#elif defined(HARDWARE_ESP32_DEV)//sp5iou 20220123
   #include "keyer_features_and_options_esp32_dev.h"
 #elif defined(HARDWARE_TEST)
   #include "keyer_features_and_options_test.h"
@@ -1484,7 +1484,7 @@ If you offer a hardware kit using this software, show your appreciation by sendi
 #elif defined(HARDWARE_MAPLE_MINI)
   #include "keyer_pin_settings_maple_mini.h"
   #include "keyer_settings_maple_mini.h"
-#elif defined(HARDWARE_ESP32_DEV)//sp5iou 20180329
+#elif defined(HARDWARE_ESP32_DEV)//sp5iou 20220123
   #include "keyer_pin_settings_esp32_dev.h"
   #include "keyer_settings_esp32_dev.h"
 #elif defined(HARDWARE_GENERIC_STM32F103C)
@@ -2330,7 +2330,7 @@ byte async_eeprom_write = 0;
 
 
 ---------------------------------------------------------------------------------------------------------*/
-// Declarations of subroutines for Platformio compilation SP5IOU 20220111
+// Declarations of subroutines for Platformio compilation SP5IOU 20220123
 void clear_send_buffer();
 int paddle_pin_read(int pin_to_read);
 void write_settings_to_eeprom(int initialize_eeprom);
@@ -2415,6 +2415,7 @@ void speed_change_command_mode(int change);
 void speed_change(int change);
 void command_alphabet_send_practice();
 void command_progressive_5_char_echo_practice();
+void command_display_memory(byte memory_number);
 
 // Subroutines --------------------------------------------------------------------------------------------
 
@@ -6192,7 +6193,7 @@ void write_settings_to_eeprom(int initialize_eeprom) {
       #endif       
     } else {
 
-    //  async_eeprom_write = 1;  // initiate an asyncrhonous eeprom write
+      async_eeprom_write = 1;  // initiate an asyncrhonous eeprom write
 
     }
   
@@ -6223,6 +6224,9 @@ void service_async_eeprom_write(){
         }
         ee++;
         p++;
+      #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220123
+        EEPROM.commit();
+      #endif
       #else
         EEPROM.update(ee++, *p++);
       #endif
@@ -6236,7 +6240,7 @@ void service_async_eeprom_write(){
       } else { // we're done
         async_eeprom_write = 0;
         last_async_eeprom_write_status = 0;
-        #if defined(ARDUINO_SAMD_VARIANT_COMPLIANCE)
+        #if defined(ARDUINO_SAMD_VARIANT_COMPLIANCE) || defined(HARDWARE_ESP32_DEV) //SP5IOU 20220123
           EEPROM.commit();
         #endif       
 
@@ -6796,7 +6800,7 @@ void tx_and_sidetone_key (int state)
       }
       if ((configuration.sidetone_mode == SIDETONE_ON) || (keyer_machine_mode == KEYER_COMMAND_MODE) || ((configuration.sidetone_mode == SIDETONE_PADDLE_ONLY) && (sending_mode == MANUAL_SENDING))) {
         #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
-         #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+         #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220123
               tone(sidetone_line,configuration.hz_sidetone,0,0);                                              // generate a tone on the speaker pin
          #else  
         tone(sidetone_line, configuration.hz_sidetone);
@@ -6821,7 +6825,7 @@ void tx_and_sidetone_key (int state)
         }
         if ((configuration.sidetone_mode == SIDETONE_ON) || (keyer_machine_mode == KEYER_COMMAND_MODE) || ((configuration.sidetone_mode == SIDETONE_PADDLE_ONLY) && (sending_mode == MANUAL_SENDING))) {
           #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
-          #if defined HARDWARE_ESP32_DEV //SP5IOU 20220115
+          #if defined HARDWARE_ESP32_DEV //SP5IOU 20220123
             noTone(sidetone_line,0);
           #else
             noTone(sidetone_line);
@@ -6876,7 +6880,7 @@ void tx_and_sidetone_key (int state)
         }
         if ((configuration.sidetone_mode == SIDETONE_ON) || (keyer_machine_mode == KEYER_COMMAND_MODE) || ((configuration.sidetone_mode == SIDETONE_PADDLE_ONLY) && (sending_mode == MANUAL_SENDING))) {
           #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
-          #if defined HARDWARE_ESP32_DEV //SP5IOU 20220115
+          #if defined HARDWARE_ESP32_DEV //SP5IOU 20220123
             noTone(sidetone_line,0);
           #else
             noTone(sidetone_line);
@@ -8337,7 +8341,7 @@ void command_progressive_5_char_echo_practice() {
               unsigned int NEWtone               =  400;                                  // the initial tone freuency for the tone sequence
               unsigned int TONEduration          =   50;                                  // define the duration of each tone element in the tone sequence to drive a speaker
               for (int k=0; k<6; k++) {
-#if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+#if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220123
  tone(sidetone_line,NEWtone,TONEduration,0);                                              // generate a tone on the speaker pin
 #else  
                                                                 // a loop to generate some increasing tones
@@ -8705,7 +8709,7 @@ void command_sidetone_freq_adj() {
   #endif
 
   while (looping) {
-    #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+    #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220123
               tone(sidetone_line,configuration.hz_sidetone,100,0);                                              // generate a tone on the speaker pin
          #else  
           tone(sidetone_line, configuration.hz_sidetone);
@@ -8762,7 +8766,7 @@ void command_sidetone_freq_adj() {
 
   }
   while (paddle_pin_read(paddle_left) == LOW || paddle_pin_read(paddle_right) == LOW || analogbuttonread(0) ) {}  // wait for all lines to go high
-          #if defined HARDWARE_ESP32_DEV //SP5IOU 20220115
+          #if defined HARDWARE_ESP32_DEV //SP5IOU 20220123
             noTone(sidetone_line,0);
           #else
             noTone(sidetone_line);
@@ -9281,7 +9285,7 @@ void beep()
     //   delay(200);
     //   noTone(sidetone_line);
     // #else
-    #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+    #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220123
       tone(sidetone_line,hz_high_beep,200,0);                                              // generate a tone on the speaker pin
     #else  
       tone(sidetone_line, hz_high_beep, 200);
@@ -9300,7 +9304,7 @@ void beep()
 void boop()
 {
   #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
-   #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+   #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220123
       tone(sidetone_line,hz_low_beep,100,0);                                              // generate a tone on the speaker pin
     #else  
  tone(sidetone_line, hz_low_beep);
@@ -9321,7 +9325,7 @@ void boop()
 void beep_boop()
 {
   #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
-#if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+#if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220123
  tone(sidetone_line,hz_high_beep,100,0);                                              // generate a tone on the speaker pin
  tone(sidetone_line,hz_low_beep,100,0);                                              // generate a tone on the speaker pin
 #else  
@@ -9345,7 +9349,7 @@ void beep_boop()
 void boop_beep()
 {
   #if !defined(OPTION_SIDETONE_DIGITAL_OUTPUT_NO_SQUARE_WAVE)
-    #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220115
+    #if defined(HARDWARE_ESP32_DEV) //SP5IOU 20220123
  tone(sidetone_line,hz_low_beep,100,0);                                              // generate a tone on the speaker pin
  tone(sidetone_line,hz_high_beep,100,0);                                              // generate a tone on the speaker pin
   #else  
@@ -18127,10 +18131,7 @@ void check_eeprom_for_initialization(){
     while (paddle_pin_read(paddle_left) == LOW && paddle_pin_read(paddle_right) == LOW) {}
     initialize_eeprom();
   }
-  #if defined DEBUG_SETUP //SP5IOU 20210825
-    Serial.println("Went setup up to here 7");
-  #endif
- 
+  
   // read settings from eeprom and initialize eeprom if it has never been written to
   if (read_settings_from_eeprom()) {
    initialize_eeprom();
@@ -22799,22 +22800,13 @@ void setup()
   initialize_keyer_state();
   initialize_potentiometer();
   initialize_rotary_encoder();
-#if defined DEBUG_SETUP //SP5IOU 20210825
-  Serial.println("Went setup up to here 0");
-#endif
   initialize_default_modes();
   initialize_watchdog();
   initialize_ethernet_variables();
-#if defined DEBUG_SETUP //SP5IOU 20210825
-  Serial.println("Went setup up to here 5");
-#endif
-  #if defined(DEBUG_EEPROM_READ_SETTINGS)
+#if defined(DEBUG_EEPROM_READ_SETTINGS)
     initialize_serial_ports();
   #endif
   check_eeprom_for_initialization();
-#if defined DEBUG_SETUP //SP5IOU 20210825
-  Serial.println("Went setup up to here 6");
-#endif
   check_for_beacon_mode();
   check_for_debug_modes();
   initialize_analog_button_array();
@@ -22830,9 +22822,7 @@ void setup()
   initialize_web_server();
   initialize_sd_card();  
   initialize_debug_startup();
-#if defined DEBUG_SETUP //SP5IOU 20210825
-  Serial.println("Setup() function completed");
-#endif
+
 }
 
 // --------------------------------------------------------------------------------------------
