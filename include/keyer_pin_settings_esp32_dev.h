@@ -1,24 +1,24 @@
 /*
 
 ESP32 dev board                                                                                  
-
+See pin assignment and limitations: https://circuits4you.com/2018/12/31/esp32-devkit-esp32-wroom-gpio-pinout/
 */
 
 /* Pins - you must review these and configure ! */
 #ifndef keyer_pin_settings_h
 #define keyer_pin_settings_h
 
-#define paddle_left 22 //36
-#define paddle_right 23 //39
-#define tx_key_line_1 16 //RX2 pin //2 //18       // (high = key down/tx on)
-#define tx_key_line_2 17 //TX2 pin //0
+#define paddle_left 32 //32 Needs external 10k Pullup can be used as touch paddle //22 //36
+#define paddle_right 33 //33 Needs external 10k Pullup can be used as touch paddle23 //39
+#define tx_key_line_1 27 //16 //RX2 pin //2 //18       // (high = key down/tx on)
+#define tx_key_line_2 25 //17 //0
 #define tx_key_line_3 0
 #define tx_key_line_4 0
 #define tx_key_line_5 0
 #define tx_key_line_6 0
-#define sidetone_line 5         // connect a speaker for sidetone
-#define potentiometer 0        // Speed potentiometer (0 to 5 V) Use pot from 1k to 10k
-#define ptt_tx_1 4              // PTT ("push to talk") lines
+#define sidetone_line 23 //5         // connect a speaker for sidetone
+#define potentiometer 39 //VN pin 0 // Speed potentiometer (0 to 3.3V) Use pot from 1k to 10k
+#define ptt_tx_1 26 //4              // PTT ("push to talk") lines
 #define ptt_tx_2 0              //   Can be used for keying fox transmitter, T/R switch, or keying slow boatanchors
 #define ptt_tx_3 0              //   These are optional - set to 0 if unused
 #define ptt_tx_4 0
@@ -48,42 +48,42 @@ FEATURE_SIDETONE_SWITCH
 
 //lcd pins
 #if defined (FEATURE_LCD_4BIT) || defined(FEATURE_LCD_8BIT) //corrected by SP5IOU 20210802
-  #define lcd_rs 32
-  #define lcd_enable 33
-  #define lcd_d4 25
-  #define lcd_d5 26
-  #define lcd_d6 27
-  #define lcd_d7 14
+  #define lcd_rs 4 //32
+  #define lcd_enable 16 //RX2 //33
+  #define lcd_d4 17 //TX2 //25
+  #define lcd_d5 5 //26
+  #define lcd_d6 18 //27
+  #define lcd_d7 19 //14
 #endif //FEATURE_LCD_4BIT
 
 #if defined(FEATURE_LCD_8BIT) // addition four data lines for 8 bit LCD control
-  #define lcd_d0 12
-  #define lcd_d1 13
-  #define lcd_d2 23
-  #define lcd_d3 22
+  #define lcd_d0 13 // 13 Note this pin can be used for Inline debugger
+  #define lcd_d1 12 // 12 Note this pin can be used for Inline debugger
+  #define lcd_d2 14 // 14 Note this pin can be used for Inline debugger
+  #define lcd_d3 15 // 15 Note this pin can be used for Inline debugger
 #endif //FEATURE_LCD_4BIT || defined(FEATURE_LCD_8BIT)
 
 
 #ifdef FEATURE_LCD1602_N07DH
-  #define lcd_rs 32
-  #define lcd_enable 33
-  #define lcd_d4 25
-  #define lcd_d5 26
-  #define lcd_d6 27
-  #define lcd_d7 14
+  #define lcd_rs 4 //32
+  #define lcd_enable 16 //RX2 //33
+  #define lcd_d4 17 //TX2 //25
+  #define lcd_d5 5 //26
+  #define lcd_d6 18 //27
+  #define lcd_d7 19 //14
 #endif //FEATURE_LCD1602_N07DH
 
 //ps2 keyboard pins
 #ifdef FEATURE_PS2_KEYBOARD
-  #define ps2_keyboard_data 16 // for STM boards it can not be Ax - muste use pin numbers only or PBx, PCx etc... sp5iou
+  #define ps2_keyboard_data 16 
   #define ps2_keyboard_clock 17    // this must be on an interrupt capable pin!
 #endif //FEATURE_PS2_KEYBOARD
 
 // rotary encoder pins and options - rotary encoder code from Jim Balls M0CKE
 #ifdef FEATURE_ROTARY_ENCODER
   #define OPTION_ENCODER_HALF_STEP_MODE     // Half-step mode?
-  #define rotary_pin1 19 //34                      // CW Encoder Pin Not all ESP32 pins supports PULLUP SP5IOU
-  #define rotary_pin2 21 //35                   // CCW Encoder Pin  Not all ESP32 pins supports PULLUP SP5IOU
+  #define rotary_pin1  34 //34 Needs external 10k Pullup  //19  // CW Encoder Pin  Not all ESP32 pins supports PULLUP SP5IOU
+  #define rotary_pin2  35 //35 Needs external 10k Pullup  //21  // CCW Encoder Pin  Not all ESP32 pins supports PULLUP SP5IOU
   #define OPTION_ENCODER_ENABLE_PULLUPS     // define to enable weak pullups.
 #endif //FEATURE_ROTARY_ENCODER
 
@@ -101,7 +101,7 @@ FEATURE_SIDETONE_SWITCH
 #endif //FEATURE_PTT_INTERLOCK
 
 #ifdef FEATURE_STRAIGHT_KEY
-  #define pin_straight_key 16
+  #define pin_straight_key 1 //TXD0
 #endif //FEATURE_STRAIGHT_KEY
 
 // FEATURE_CW_DECODER & OPTION_CW_DECODER_GOERTZEL_AUDIO_DETECTOR

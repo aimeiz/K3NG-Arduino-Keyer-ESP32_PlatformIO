@@ -1663,7 +1663,7 @@ class ButtonArray {
 #endif
 
 #if defined(FEATURE_ETHERNET)
-#if !defined(ARDUINO_MAPLE_MINI) && !defined(ARDUINO_GENERIC_STM32F103C) //sp5iou 20180329
+#if !defined(ARDUINO_MAPLE_MINI) && !defined(ARDUINO_GENERIC_STM32F103C) && !defined(HARDWARE_ESP32_DEV)//sp5iou 20180329
   #include <Ethernet.h>  // if this is not included, compilation fails even though all ethernet code is #ifdef'ed out
   #if defined(FEATURE_INTERNET_LINK)
     #include <EthernetUdp.h>
@@ -2416,7 +2416,8 @@ void speed_change(int change);
 void command_alphabet_send_practice();
 void command_progressive_5_char_echo_practice();
 void command_display_memory(byte memory_number);
-
+void display_scroll_print_char(char charin);
+void service_ptt_interlock();
 // Subroutines --------------------------------------------------------------------------------------------
 
 
