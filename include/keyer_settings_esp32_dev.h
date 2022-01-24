@@ -14,22 +14,22 @@ GENERIC STM32F103C
 #define hz_low_beep 400                  // frequency in hertz of low beep
 #define initial_dah_to_dit_ratio 300     // 300 = 3 / normal 3:1 ratio
 #define initial_ptt_lead_time_tx1 0         // PTT lead time in mS
-#define initial_ptt_tail_time_tx1 10         // PTT tail time in mS
+#define initial_ptt_tail_time_tx1 0 //10         // PTT tail time in mS //SP5IOU - better to change it by CLI
 #define initial_ptt_lead_time_tx2 0         // PTT lead time in mS
-#define initial_ptt_tail_time_tx2 10         // PTT tail time in mS
+#define initial_ptt_tail_time_tx2 0 //10         // PTT tail time in mS
 #define initial_ptt_lead_time_tx3 0         // PTT lead time in mS
-#define initial_ptt_tail_time_tx3 10         // PTT tail time in mS
+#define initial_ptt_tail_time_tx3 0 //10         // PTT tail time in mS
 #define initial_ptt_lead_time_tx4 0         // PTT lead time in mS
-#define initial_ptt_tail_time_tx4 10         // PTT tail time in mS
+#define initial_ptt_tail_time_tx4 0 //10         // PTT tail time in mS
 #define initial_ptt_lead_time_tx5 0         // PTT lead time in mS
-#define initial_ptt_tail_time_tx5 10         // PTT tail time in mS
+#define initial_ptt_tail_time_tx5 0 //10         // PTT tail time in mS
 #define initial_ptt_lead_time_tx6 0         // PTT lead time in mS
-#define initial_ptt_tail_time_tx6 10         // PTT tail time in mS
+#define initial_ptt_tail_time_tx6 0 //10         // PTT tail time in mS
 #define initial_qrss_dit_length 1        // QRSS dit length in seconds
-#define initial_pot_wpm_low_value 13     // Potentiometer WPM fully CCW
-#define initial_pot_wpm_high_value 35    // Potentiometer WPM fully CW
+#define initial_pot_wpm_low_value 6 //13     // Potentiometer WPM fully CCW //SP5IOU to narrow range
+#define initial_pot_wpm_high_value 45 //35    // Potentiometer WPM fully CW
 #define wpm_limit_low 5
-#define wpm_limit_high 60
+#define wpm_limit_high 45 //60
 #define potentiometer_change_threshold 0.9 // don't change the keyer speed until pot wpm has changed more than this
 #define send_buffer_size 150
 #define default_length_letterspace 3
@@ -37,7 +37,7 @@ GENERIC STM32F103C
 #define default_keying_compensation 0    // number of milliseconds to extend all dits and dahs - for QSK on boatanchors
 #define default_first_extension_time 0   // number of milliseconds to extend first sent dit or dah
 //#define default_pot_full_scale_reading 1023 //For AVR boards
-#define default_pot_full_scale_reading 4095 //SP5IOU 20180329 FOR stm32 Boards.
+#define default_pot_full_scale_reading 4095 //SP5IOU 20180329 FOR stm32 and esp32 Boards.
 #define default_weighting 50             // 50 = weighting factor of 1 (normal)
 #define default_ptt_hang_time_wordspace_units 0.0
 #define winkey_c0_wait_time 1            // the number of milliseconds to wait to send 0xc0 byte after send buffer has been sent
@@ -63,7 +63,7 @@ GENERIC STM32F103C
 #define default_cw_echo_timing_factor 1.75 // "factory default" setting
 #define default_autospace_timing_factor 2.0 // "factory default" setting
 #define winkey_paddle_echo_buffer_decode_timing_factor 0.25
-#define potentiometer_always_on 0
+#define potentiometer_always_on 1 //0 //On ESP32 0 didn't work
 #define ptt_interlock_check_every_ms 100
 #define ptt_interlock_active_state HIGH
 #define unknown_cw_character '*'
@@ -80,7 +80,7 @@ GENERIC STM32F103C
 #define eeprom_write_time_ms 30000
 
 #ifdef FEATURE_BUTTONS
-  #define analog_buttons_number_of_buttons 9 // For Keypad only command butrton is neaded 6 //4  // includes the command button (command button + 3 memory buttons = 4) //sp5iou 20180319
+  #define analog_buttons_number_of_buttons 6 // For Keypad only command butrton is neaded 6 //4  // includes the command button (command button + 3 memory buttons = 4) //sp5iou 20180319
   #define analog_buttons_r1 10
   #define analog_buttons_r2 1
 #endif
@@ -89,8 +89,8 @@ GENERIC STM32F103C
 #if defined(FEATURE_BUTTONS) &&  !defined(FEATURE_PS2_KEYBOARD) && !defined(FEATURE_USB_KEYBOARD) && !defined(FEATURE_COMMAND_LINE_INTERFACE) && !defined(FEATURE_WINKEY_EMULATION)
   #define number_of_memories byte(analog_buttons_number_of_buttons-1)
 #else
-//  #define number_of_memories byte(12)
-  #define number_of_memories byte(8) //sp5iou 20180329 With many memories, be carefull to not put to much content. It caould disable memory programming and eeprom formatting is then necessary
+//  #define number_of_memories byte(8)
+  #define number_of_memories byte(10) //sp5iou 20220124 With many memories, be carefull to not put to much content. It caould disable memory programming and eeprom formatting is then necessary
 #endif
 
 #ifdef FEATURE_CAPACITIVE_PADDLE_PINS

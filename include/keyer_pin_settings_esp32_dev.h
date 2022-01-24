@@ -17,7 +17,7 @@ See pin assignment and limitations: https://circuits4you.com/2018/12/31/esp32-de
 #define tx_key_line_5 0
 #define tx_key_line_6 0
 #define sidetone_line 23 //5         // connect a speaker for sidetone
-#define potentiometer 39 //VN pin 0 // Speed potentiometer (0 to 3.3V) Use pot from 1k to 10k
+#define potentiometer 39 //A3 - VN pin 0 // Speed potentiometer (0 to 3.3V) Use pot from 1k to 10k
 #define ptt_tx_1 26 //4              // PTT ("push to talk") lines
 #define ptt_tx_2 0              //   Can be used for keying fox transmitter, T/R switch, or keying slow boatanchors
 #define ptt_tx_3 0              //   These are optional - set to 0 if unused
@@ -30,7 +30,7 @@ See pin assignment and limitations: https://circuits4you.com/2018/12/31/esp32-de
 #define potentiometer_enable_pin 0  // if defined, the potentiometer will be enabled only when this pin is held low; set to 0 to ignore this pin
 
 #ifdef FEATURE_BUTTONS
-  #define analog_buttons_pin A0 //VP pin on the board Not all pins of ESP32 are available for ADC. See https://circuits4you.com/2018/12/31/esp32-devkit-esp32-wroom-gpio-pinout/
+  #define analog_buttons_pin 36 //A0 //VP pin on the board Not all pins of ESP32 are available for ADC. See https://circuits4you.com/2018/12/31/esp32-devkit-esp32-wroom-gpio-pinout/
   #define command_mode_active_led 2 //for ESP32 On Board LED
 #endif //FEATURE_BUTTONS
 

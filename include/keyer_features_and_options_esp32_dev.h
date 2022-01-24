@@ -11,7 +11,7 @@
 #define FEATURE_BEACON                // Go into beacon mode if paddle_left pin is LOW at boot up
 #define FEATURE_BEACON_SETTING        // Go into beacon mode at boot up if EEPROM setting is enabled (\_ CLI Command)
 #define FEATURE_TRAINING_COMMAND_LINE_INTERFACE
-// #define FEATURE_POTENTIOMETER         // do not enable unless you have a potentiometer connected, otherwise noise will falsely trigger wpm changes
+////#define FEATURE_POTENTIOMETER         // do not enable unless you have a potentiometer connected, otherwise noise will falsely trigger wpm changes
 // #define FEATURE_SIDETONE_SWITCH   // adds switch control for the sidetone output. requires an external toggle switch (assigned to an arduino pin - see keyer_pin_settings.h). 
 //#define FEATURE_SIDETONE_NEWTONE      // Use the NewTone library, ~1k smaller code size than the standard tone library. Uses timer1 (pins 9 or 10)  https://bitbucket.org/teckel12/arduino-new-tone/wiki/Home
 #define FEATURE_SERIAL_HELP
@@ -47,8 +47,8 @@
 //#define FEATURE_PTT_INTERLOCK 
 #define FEATURE_QLF
 // #define FEATURE_EEPROM_E24C1024
-#define FEATURE_STRAIGHT_KEY
- #define FEATURE_DYNAMIC_DAH_TO_DIT_RATIO
+////#define FEATURE_STRAIGHT_KEY //This features disables memory macros on ESP32 SP5IOU 20220124
+//#define FEATURE_DYNAMIC_DAH_TO_DIT_RATIO
 // #define FEATURE_PADDLE_ECHO         // you may also need to comment out line 19 in the file keyer_dependencies.h
 // #define FEATURE_STRAIGHT_KEY_ECHO
 // #define FEATURE_AMERICAN_MORSE
